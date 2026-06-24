@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#6d5dfc">
+  <title>学习积分幸运转盘</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">STUDY REWARD</p>
+        <h1>学习积分幸运转盘</h1>
+        <p class="hero-copy">完成任务攒积分，花 50 积分抽一次奖励。</p>
+      </div>
+      <button class="icon-button" id="resetButton" type="button" aria-label="重置全部数据" title="重置全部数据">↻</button>
+    </header>
+
+    <section class="balance-card" aria-label="积分余额">
+      <div>
+        <span class="muted">当前积分</span>
+        <div class="balance-line"><span id="pointsValue">300</span><small>积分</small></div>
+      </div>
+      <div class="balance-actions">
+        <button class="secondary-button" id="adjustButton" type="button">调整积分</button>
+        <span class="draw-cost">每抽 −50</span>
+      </div>
+    </section>
+
+    <section class="status-panel" id="statusPanel" aria-label="当前效果">
+      <div class="section-heading compact">
+        <h2>当前效果</h2>
+        <span id="pityText">幸运值 0/5</span>
+      </div>
+      <div class="status-list" id="statusList"></div>
+    </section>
+
+    <section class="wheel-section" aria-label="抽奖转盘">
+      <div class="pointer" aria-hidden="true"></div>
+      <div class="wheel-wrap">
+        <div class="wheel" id="wheel" aria-hidden="true"></div>
+        <button class="spin-button" id="spinButton" type="button">
+          <strong>抽</strong>
+          <span>50 积分</span>
+        </button>
+      </div>
+      <p class="wheel-tip" id="wheelTip">积分足够，点击中心按钮开始抽奖</p>
+    </section>
+
+    <section class="card task-card">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">快速入账</p>
+          <h2>完成学习任务</h2>
+        </div>
+        <button class="text-button" id="customTaskButton" type="button">自定义</button>
+      </div>
+      <div class="task-grid" id="taskGrid">
+        <button class="task-button" type="button" data-points="25" data-name="背单词">
+          <span>📖 背单词</span><strong>+25</strong>
+        </button>
+        <button class="task-button" type="button" data-points="10" data-name="完成网课">
+          <span>🎧 完成网课</span><strong>+10</strong>
+        </button>
+        <button class="task-button" type="button" data-points="10" data-name="客观题3题">
+          <span>✍️ 客观题3题</span><strong>+10</strong>
+        </button>
+        <button class="task-button" type="button" data-points="20" data-name="整理错题">
+          <span>📝 整理错题</span><strong>+20</strong>
+        </button>
+      </div>
+      <button class="claim-button hidden" id="claimInsightButton" type="button">已完成高难度任务，领取 +100 积分</button>
+    </section>
+
+    <section class="card">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">概率公开</p>
+          <h2>本期奖池</h2>
+        </div>
+        <span class="rules-tag">5 抽保底稀有奖励</span>
+      </div>
+      <div class="prize-list" id="prizeList"></div>
+      <p class="footnote">保底规则：连续 5 次未抽到稀有奖励时，下一抽必得稀有奖励；免费抽不会扣积分。</p>
+    </section>
+
+    <section class="card history-card">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">自动保存</p>
+          <h2>最近记录</h2>
+        </div>
+        <button class="text-button" id="clearHistoryButton" type="button">清空</button>
+      </div>
+      <div class="history-list" id="historyList"></div>
+    </section>
+  </main>
+
+  <dialog class="dialog" id="resultDialog">
+    <div class="dialog-content result-content">
+      <button class="dialog-close" type="button" data-close-dialog aria-label="关闭">×</button>
+      <div class="result-icon" id="resultIcon">🎁</div>
+      <p class="section-kicker">本次抽中</p>
+      <h2 id="resultTitle">积分补给</h2>
+      <p id="resultDescription"></p>
+      <button class="primary-button" type="button" data-close-dialog>收下奖励</button>
+    </div>
+  </dialog>
+
+  <dialog class="dialog" id="pointsDialog">
+    <form class="dialog-content" id="pointsForm" method="dialog">
+      <button class="dialog-close" type="button" data-close-dialog aria-label="关闭">×</button>
+      <p class="section-kicker">积分管理</p>
+      <h2>调整当前积分</h2>
+      <label class="field-label" for="pointsInput">输入新的积分余额</label>
+      <input class="number-input" id="pointsInput" type="number" min="0" max="999999" step="1" required>
+      <button class="primary-button" type="submit">保存积分</button>
+    </form>
+  </dialog>
+
+  <dialog class="dialog" id="customTaskDialog">
+    <form class="dialog-content" id="customTaskForm" method="dialog">
+      <button class="dialog-close" type="button" data-close-dialog aria-label="关闭">×</button>
+      <p class="section-kicker">任务积分</p>
+      <h2>添加自定义任务</h2>
+      <label class="field-label" for="taskNameInput">任务名称</label>
+      <input class="number-input text-input" id="taskNameInput" type="text" maxlength="20" placeholder="例如：完成一套真题" required>
+      <label class="field-label" for="taskPointsInput">基础积分</label>
+      <input class="number-input" id="taskPointsInput" type="number" min="1" max="1000" step="1" value="30" required>
+      <button class="primary-button" type="submit">任务完成，积分入账</button>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
+
